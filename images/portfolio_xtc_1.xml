@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job version="1" description="run a query, revert text and save to CSV">
+  <settings>
+  </settings>
+  <extract>
+    <params><!-- extract-wide params -->
+      <db_name>database</db_name>
+      <db_host>host</db_host>
+      <db_port>3306</db_port>
+      <db_user_name>user</db_user_name>
+      <db_user_password>password</db_user_password>
+      <query1>SELECT IdMao FROM %arg_1% LIMIT %arg_2%</query1>
+    </params>
+    <step name="extract from DB">
+      <params>
+        <arg_1>catalog</arg_1>
+        <arg_2>10</arg_2>
+        <query>query1</query>
+      </params>
+      <agent>
+        <type>plugin</type>
+        <name>mysql_db_operations</name>
+        <operation>sql_query</operation>
+      </agent>
+      <output>
+        <set>set_1</set>
+      </output>
+    </step>
+  </extract>
+  <transform>
+    <step name="reverse all row text">
+      <agent>
+        <type>plugin</type>
+        <name>string_operations</name>
+        <operation>reverse</operation>
+        <set>set_1</set>
+      </agent>
+      <output>
+        <set>set_1_reversed</set>
+      </output>
+    </step>
+    <step name="upcase all text">
+      <agent>
+        <type>plugin</type>
+        <name>string_operations</name>
+        <operation>upcase</operation>
+        <set>set_1_reversed</set>
+      </agent>
+      <output>
+        <set>set_1_reversed_upcase</set>
+      </output>
+    </step>
+  </transform>
+  <commit>
+    <step name="commit to csv file">
+      <params>
+        <delimiter>,</delimiter>
+        <file_name>output.csv</file_name>
+        <set>set_1_reversed_upcase</set>
+      </params>
+      <agent>
+        <type>plugin</type>
+        <name>file_operations</name>
+        <operation>save_to_csv</operation>
+      </agent>
+    </step>
+  </commit>
+</job>

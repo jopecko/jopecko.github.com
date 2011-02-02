@@ -1,0 +1,36 @@
+---
+layout: post
+title: Sieve of Eratosthenes
+tags: [ruby]
+author_name: Joe O'Pecko
+author_uri: http://twitter.com/opeckojo
+---
+
+I've been following the comments for Uncle Bob’s blog post "Master Craftsman Team":http://blog.objectmentor.com/articles/2009/04/01/master-craftsman-teams. In one of the comments, Uncle Bob mentioned a simple test he uses for interviews called the "Sieve of Eratosthenes":http://en.wikipedia.org/wiki/Sieve_of_Eratosthenes. Since I'm into the Ruby learning lately, I figured why not give it a try. The algorithm is fairly straightforward. Translating it to Ruby was too. Here's my first attempt:
+
+{% highlight ruby %}
+# Algorithm:
+# 1. Create a contiguous list of numbers from two to some
+#    highest number n
+# 2. Strike out all multiples of two (4, 6, 8 etc.)
+# 3. The list's next number that has not been struck out is a
+#    prime number
+# 4. Strike out from the list all multiples of the number
+#    identified in the previous step
+# 5. Repeat steps 3 and 4 until you reach a number that is
+#    greater than the square root of n (the highest number in
+#    the list)
+# 6. All the remaining numbers in the list are prime
+
+def sieve_of_eratosthenes(upper_bound)
+  list = Range.new(2, upper_bound).to_a
+  primes = []
+  begin
+    prime = list.shift
+    list = list.select {|i| i % prime != 0 }
+    primes << prime
+  end while prime < Math.sqrt(upper_bound)
+  primes + list
+end
+{% endhighlight %}
+
