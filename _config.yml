@@ -1,2 +1,31 @@
-permalink: pretty
-paginate: 5
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+title: higher-order
+#email: your-email@domain.com
+description: >
+  Articles on systems engineering, software development, and scalable data
+  stores. Opinions expressed are solely my own and do not express the views
+  or opinions of my employer.
+#baseurl: "/jekyll-simple" # the subpath of your site, e.g. /blog
+#url: "http://wildflame.me" # the base hostname & protocol for your site
+twitter_username: opeckojo
+github_username:  jopecko
+
+# Build settings
+markdown: kramdown
+kramdown:
+  input: GFM
+
+# Third-party services
+# just leave someone empty to disable it
+# google_analytics:
+disqus_shortname:
+
+# used this for post_excerpt at index_page
+excerpt_separator: <!--description-->

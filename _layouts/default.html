@@ -1,69 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>{{ page.title }}</title>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" type="text/css" href="/css/default.css" />
-    <link rel="stylesheet" type="text/css" href="/css/syntax.css" />
-    <!--<link href="http://feeds.feedburner.com/opeckojo" type="application/atom+xml" rel="alternate" title="joe.opecko.net" />-->
-    <script type="text/javascript" src="/js/prototype.js"></script>
-    <script type="text/javascript" src="/js/scriptaculous.js?load=effects,builder"></script>
-    <script type="text/javascript" src="/js/lightbox.js"></script>
-    <link rel="stylesheet" href="/css/lightbox.css" type="text/css" media="screen" />
-</head>
-<body class='{{ page.page_name }}'>
-    <div id="top">
-    </div>
-
-    <div id="content">
-    <div id="banner">
-        <h1>joe.opecko.net</h1>
-       <div class='clear'></div>
-            <ul>
-               <li class='about'><a href='/about/'>About</a></li>
-                <li class='blog'><a href='/'>Blog</a></li>
-                <li class='archives'><a href='/tags/'>Archives</a></li>
-                <li class='resume'><a href='/resume/'>Resume</a></li>
-                <li class='portfolio'><a href='/portfolio/'>Portfolio</a></li>
-                <!--<li style='float:right'><a href="http://feeds.feedburner.com/iruel">RSS</a></li>-->
-                <li style='float:none;' class='clear'></li>
-            </ul>
+  {% include head.html %}
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          {% include header.html %}
         </div>
-        <div id="page">
-             <div id="main">
-                  {{ content }}
-            </div>
-            <div id="sidebar">
-                <br />
-                <h3>Around the Web</h3>
-                <ul id="links">
-                    <li class="github"><a href="http://github.com/opeckojo/" rel="me" class="url">Github</a></li>
-                    <li class="twitter"><a href="http://twitter.com/opeckojo" rel="me" class="url">Twitter</a></li>
-                    <li class="linkedin"><a href="http://www.linkedin.com/in/opeckojo" rel="me" class="url">LinkedIn Profile</a></li>
-                </ul>
-                <div id="twitter_div">
-                    <h3>Twitter Updates</h3>
-                    <ul id="twitter_update_list"></ul>
-                </div>
-            </div>
-            <div id="license">
-            </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            {{ content }}
+          </div>
         </div>
+      </div>
+      {% include footer.html %}
     </div>
-
-    <div id="bottom">
-        <a href="/about/">About</a> |
-        <a href="/">Blog</a> |
-        <a href="/tags/">Archives</a> |
-        <a href="/resume/">Resume</a> |
-        <a href="/portfolio/">Porfolio</a> |
-        <!--<a href="http://feeds.feedburner.com/opeckojo">RSS</a>-->
-    </div>
-
-    <!-- Twitter Badge Code -->
-    <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
-    <script type="text/javascript" src="http://twitter.com/statuses/user_timeline/opeckojo.json?callback=twitterCallback2&amp;count=5"></script>
-
-</body>
+  </body>
 </html>
-
