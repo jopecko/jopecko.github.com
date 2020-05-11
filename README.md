@@ -4,6 +4,13 @@ This repository contains the data for my blog
 
 It is automatically tranformed by "Jekyll":http://github.com/mojombo/jekyll into a static site whenever I push this repository to GitHub.
 
+# Quickstart
+
+```
+$ export JEKYLL_VERSION=4.0
+$ docker run -p4000:4000 --rm --volume="$PWD:/srv/jekyll" -it jekyll/jekyll:$JEKYLL_VERSION jekyll server
+```
+
 # License
 
 All original textual content is licensed under the "Creative Commons Attribution-Noncommercial-No Derivative Works 3.0 United States License":http://creativecommons.org/licenses/by-nc-nd/3.0/us/.
