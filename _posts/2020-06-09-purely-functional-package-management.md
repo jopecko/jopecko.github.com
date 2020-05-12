@@ -103,6 +103,7 @@ Another helpful resource that goes deeper into Nix is Geoffrey Huntley's
 treasure trove of learnings I plan on mining next.
 
 ### Next Steps
+
 {:.article-content}
 In Tim's talk, he mentions how he uses [NixOS][5] in addition to the Nix package
 manager. NixOS is a GNU/Linux distribution that allows you to achieve a fully
