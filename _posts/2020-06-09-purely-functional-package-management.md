@@ -26,6 +26,64 @@ for using Nix. For me, some highlights from the talk were
 
 ### Quickstart
 
+*Update* 2020-05-10
+
+The first time I ran through the steps below, I ran into the following issue on
+Catalina:
+
+```
+mkdir: cannot create directory ‘/nix’: Read-only file system
+```
+
+Starting with Catalina, macOS is split across two volumes (system and data) with
+the system volume being read-only and non-writable. After some searching through
+Nix issues and random blog posts I can across a [script][12] to help create the
+appropriate APFS volume and mount point. The shortened URL follows:
+
+```
+$ curl -L https://git.io/JfRJm | sh
+```
+
+Once completed you'll see the following output:
+
+```
+ ------------------------------------------------------------------
+| This installer will create a volume for the nix store and        |
+| configure it to mount at /nix.  Follow these steps to uninstall. |
+  ------------------------------------------------------------------
+
+  1. Remove the entry from fstab using 'sudo vifs'
+  2. Destroy the data volume using 'diskutil apfs deleteVolume'
+  3. Remove the 'nix' line from /etc/synthetic.conf or the file
+
+Configuring /etc/synthetic.conf...
+Password:
+nix
+Creating mountpoint for /nix...
+Creating a Nix Store volume...
+Will export new APFS Volume "Nix Store" from APFS Container Reference disk1
+Started APFS operation on disk1
+Preparing to add APFS Volume to APFS Container disk1
+Creating APFS Volume
+Created new APFS Volume disk1s6
+Mounting disk
+Setting volume permissions
+Disk from APFS operation: disk1s6
+Finished APFS operation on disk1
+Configuring /etc/fstab...
+123
+164
+
+The following options can be enabled to disable spotlight indexing
+of the volume, which might be desirable.
+
+   $ sudo mdutil -i off /nix
+```
+
+I wasn't able to successfully disable spotlight indexing of the `/nix` volume
+until after I rebooted my machine, which you need to do before proceeding anyway.
+Now that the volume is available, we can proceed with the installation.
+
 By default, the Nix installer will perform a single-user installation. However,
 the documentation *highly* recommends opting in to the mult-user installation.
 
@@ -127,3 +185,4 @@ functional, and sane systems management.
 [9]:  https://github.com/ghuntley/workshops/tree/master/nix-workshop
 [10]: https://github.com/ghuntley/workshops/tree/master/nixos-workshop
 [11]: https://github.com/jopecko/dotfiles
+[12]: https://github.com/LnL7/nix/blob/darwin-10.15-install/scripts/create-darwin-volume.sh
