@@ -37,8 +37,9 @@ mkdir: cannot create directory ‘/nix’: Read-only file system
 
 Starting with Catalina, macOS is split across two volumes (system and data) with
 the system volume being read-only and non-writable. After some searching through
-Nix issues and random blog posts I can across a [script][12] to help create the
-appropriate APFS volume and mount point. The shortened URL follows:
+Nix issues and random blog posts I came across [NixOS/nix#3212][12] and the
+relevant [script][13] to help create the appropriate APFS volume and mount point.
+The shortened URL follows:
 
 ```
 $ curl -L https://git.io/JfRJm | sh
@@ -185,4 +186,5 @@ functional, and sane systems management.
 [9]:  https://github.com/ghuntley/workshops/tree/master/nix-workshop
 [10]: https://github.com/ghuntley/workshops/tree/master/nixos-workshop
 [11]: https://github.com/jopecko/dotfiles
-[12]: https://github.com/LnL7/nix/blob/darwin-10.15-install/scripts/create-darwin-volume.sh
+[12]: https://github.com/NixOS/nix/pull/3212
+[13]: https://github.com/LnL7/nix/blob/darwin-10.15-install/scripts/create-darwin-volume.sh
