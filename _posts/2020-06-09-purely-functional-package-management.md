@@ -26,8 +26,6 @@ for using Nix. For me, some highlights from the talk were
 
 ### Quickstart
 
-*Update* 2020-05-10
-
 The first time I ran through the steps below, I ran into the following issue on
 Catalina:
 
@@ -35,6 +33,7 @@ Catalina:
 mkdir: cannot create directory ‘/nix’: Read-only file system
 ```
 
+{:.article-content}
 Starting with Catalina, macOS is split across two volumes (system and data) with
 the system volume being read-only and non-writable. After some searching through
 Nix issues and random blog posts I came across [NixOS/nix#3212][12] and the
