@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Reboot"
-date: 2019-03-26 20:44:26 +0800
+date: 2019-03-26 20:44:26 GMT-8
 categories: misc
 ---
 I'm declaring bankruptcy on my blog and starting over again with a shiny new theme and the hope that I'll be more consistent and deliberate. Stay tuned.
