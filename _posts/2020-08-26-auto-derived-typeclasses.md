@@ -3,9 +3,9 @@ layout: post
 title:  "Auto Derived Typeclasses - a cautionary tale"
 date: 2020-08-26 20:26:27 GMT-7
 categories: scala circe typeclasses performance
+description: In which auto derived serdes took down our CI build
 ---
 
-{:.article-content}
 On a recent greenfield project, where we were quickly iterating on features and hammering
 out the shape of a new Scala &mu;service, we decided to use Circe's
 [automatic typeclass derivation][1] to synthesize the `Encoder`s and `Decoder`s for the
@@ -14,7 +14,6 @@ win. The codebase was clean and unencumbered with any of the necessary boilerpla
 involving the declaration of serdes. The compiler will materialize any typeclass type `T`
 that's not in scope. All that's required is a simple import `io.circe.generic.auto._`.
 
-{:.article-content}
 At first everything was great as we were free to hack with wild abandon as we fleshed out
 the requirements. In retrospect it feels that relying so heavily on this was willfully
 embracing [creeping normality][2] as compilation times starting ticking slowly, imperceptibly,
@@ -24,11 +23,10 @@ and too easily ignored. Scala is already quite well-known for lengthy compilatio
 during a typical day, when you're busy hacking, compiling, reading slack, etc., its all too
 easy to neglect.
 
-{:.article-content}
 The first sign of trouble appeared seemingly out of no where. An otherwise standard and
 minimally additive patch started behaving erratically on our CI system. Builds were successful
-*most* of time, but occassionally failed. And when they failed, they failed for baffling reasons.
-Coupled with the fact that we had recently upgraded `sbt` and we found ourselves chasing
+*most* of the time, but occassionally failed. And when they failed, they failed for baffling
+reasons. Coupled with the fact that we had recently upgraded `sbt`, we found ourselves chasing
 non-existent tooling issues. For example, this was an example of one the interrmitent errors we
 were seeing:
 
@@ -226,38 +224,33 @@ were seeing:
 [error] Total time: 115 s (01:55), completed Aug 21, 2020, 10:37:21 PM
 ```
 
-{:.article-content}
-Upon stumbling upon this error, we started to think we had some incompatibilities with the
-compiler plugin we were using and the version of `sbt`. Every plugin backed out and `sbt`
-version change produced the same results. Some builds succeeded and some failed. We had to
-start looking elsewhere.
+Upon stumbling on this error, we started to think we had some incompatibilities with the
+compiler plugins we were using and the version of `sbt`. Every plugin backed out and `sbt`
+version change produced the same or similar failures. Some builds succeeded and some failed.
+ We had to start looking elsewhere.
 
-{:.article-content}
 Since we build within a container, we started to suspect that perhaps we were running out of
 memory in our build process. We had to allocate an obsene amount of memory to our container
 to get the build back to consistently green. This was when I started to suspect a problem
 with our implicit approach.
 
-{:.article-content}
 Running builds with the following [compiler flags][3]:
 * `-Ystatistics`
 * `-Yshow-trees`
 * `-Ydebug`
 
-{:.article-content}
-started to shed some light on the situation. The times spent handling implicits seemd to have
+started to shed some light on the situation. The times spent handling implicits seemed to have
 become an issue. Then I discovered [this][4] blog post on scalac profiling, which discusses the
 cost of implicit macros. At this point I figured a quick fix would be to just switch to Circe's
 [semi-automatic derivation][5] instead. Placing them in the companion objects for the GADTs
 minimizes the [implicit import tax][7] as well.
 
-{:.article-content}
 In retrospect, I feel like my experience should have warned me off of auto derivation but the
 appeal was too great at the time. I can only hope that, given another chance to make a similar
 decision, I don't repeat this mistake. I'm sure auto derived typeclasses have their place,
 however, I'm not sure at this time what that could be. Time permitting, I'd like to revisit this
 in the future and do a proper post-mortem on this comparing the two approaches and figuring out
-what was saved by changing from one approach to the other. For another time...
+what was saved by changing from one approach to the other. For another time though...
 
 
 [1]: https://circe.github.io/circe/codecs/auto-derivation.html

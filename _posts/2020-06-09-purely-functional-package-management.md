@@ -1,17 +1,16 @@
 ---
 layout: post
 title:  "Purely Functional Package Management"
-date: 2020-05-09 21:08:26 +0700
+date: 2020-05-09 21:08:26 GMT-7
 categories: nix
+description: My plans to leverage Nix to manage my dotfiles
 ---
 
-{:.article-content}
 Being a fan of pure functional programming, I'm intrigued by the prospect of
 applying those concepts to package management on my systems. Since I'm mostly
 on macOS these days, I'm going to start with the [Nix][1] package manager for
 my initial foray into this new and exciting world.
 
-{:.article-content}
 I've been a dedicated user of [Homebrew][2] since [Max][3] first released it.
 However, after watching Tim Steinbach's &#955;C 2019 presentation [Sane System
 Management with NixOS - I Do Declare!][4], I found myself motivated to give Nix
@@ -33,7 +32,6 @@ Catalina:
 mkdir: cannot create directory ‘/nix’: Read-only file system
 ```
 
-{:.article-content}
 Starting with Catalina, macOS is split across two volumes (system and data) with
 the system volume being read-only and non-writable. After some searching through
 Nix issues and random blog posts I came across [NixOS/nix#3212][12] and the
@@ -136,7 +134,6 @@ Hopefully we won't need it as I anticipate not wanting to come back after
 we free our mind and take the red pill, but better to be safe and prepared just
 in case we change our mind.
 
-{:.article-content}
 [Salar Rahmanian][7] put together a quick guide on getting started migrating
 off homebrew. In it he provides a command that lists the formula installed by
 homebrew and the formulae installed that specify the formula as a dependency.
@@ -152,23 +149,19 @@ a similarly named package:
 $ nix-env -qaP | grep -i <packagename>
 ```
 
-{:.article-content}
 or [search packages][8] online to find a suitable Nix flavored package.
 
-{:.article-content}
 Another helpful resource that goes deeper into Nix is Geoffrey Huntley's
 [Mastering Nix Workshop][9]. This coupled with [Mastering NixOS][10] offer a
 treasure trove of learnings I plan on mining next.
 
 ### Next Steps
 
-{:.article-content}
 In Tim's talk, he mentions how he uses [NixOS][5] in addition to the Nix package
 manager. NixOS is a GNU/Linux distribution that allows you to achieve a fully
 declarative system configuration model. [Nix modules for darwin][6] attempts to
 achieve similar things for macOS.
 
-{:.article-content}
 Once I've fully digested these concepts, I'd like to codify the best practices in
 my [dotfiles][11] repo and get to an even more idealized place of consistent,
 functional, and sane systems management.
