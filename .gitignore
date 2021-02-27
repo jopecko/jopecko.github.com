@@ -2,3 +2,7 @@ _site
 .sass-cache
 .jekyll-metadata
 .jekyll-cache/
+
+# not recommended as per
+# https://jekyllrb.com/docs/continuous-integration/github-actions
+Gemfile.lock
