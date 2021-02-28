@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>nearly functional</title>
+    <description>Articles on systems engineering, software development, and scalable data stores. Opinions expressed are solely my own and do not express the views or opinions of my employer.
+</description>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sun, 28 Feb 2021 23:04:47 +0000</pubDate>
+    <lastBuildDate>Sun, 28 Feb 2021 23:04:47 +0000</lastBuildDate>
+    <generator>Jekyll v4.2.0</generator>
+    
+      <item>
+        <title>Jekyll GitHub Actions</title>
+        <description>&lt;p&gt;I had wanted to add a new collection to this site with a categorized view of various
+code snippets to collect for posterity. I was inspired by Alexandru Nedelcu’s
+&lt;a href=&quot;https://alexn.org/snippets&quot;&gt;snippet section&lt;/a&gt; where he has a similar collection of unstructured code dumps.&lt;/p&gt;
+
+&lt;p&gt;Previously, this site leveraged the simple setup provided by &lt;a href=&quot;https://pages.github.com&quot;&gt;GitHub&lt;/a&gt;, which makes
+setting up a GitHub Pages site with Jekyll, hosted directly from a GitHub repository,
+quick and painless. The default setup gives you quite a bit in terms of low barrier
+blogging. For example, GitHub builds the site automatically on push to your repo and
+enables some Jekyll &lt;a href=&quot;https://docs.github.com/en/github/working-with-github-pages/about-github-pages-and-jekyll#plugins&quot;&gt;plugins&lt;/a&gt; by default. However, if your needs extends beyond
+this set of plugins, GitHub Pages cannot build sites using unsupported plugins. If you
+want to use unsupported plugins, you need to generate the site locally and push the
+static files to GitHub.&lt;/p&gt;
+
+&lt;p&gt;When I program, I don’t typically store machine generated source or compiled binaries in
+my version control system. I see the statically generated site through a similar lens and
+felt it wasn’t something I wanted to manage myself. So I did some digging and found a
+&lt;a href=&quot;https://jekyllrb.com/docs/continuous-integration/github-actions&quot;&gt;page&lt;/a&gt; on the Jekyll documentation site for setting up &lt;a href=&quot;https://github.com/marketplace/actions/jekyll-actions&quot;&gt;jekyll-actions&lt;/a&gt;, which
+should be able to do the work for me instead. The generated site will still be stored in
+my repo in order for GitHub to be able to serve the site, however, it’ll be sequestered
+to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; branch and completely managed by the workflow. A compromise I can happily
+live with. In order to get the new workflow to function, I needed to make some configuration
+changes to my repo. First, as the documentation site states, I needed to create a Personal
+Access Token. After that was configured as a secret for my repo, I was able to push the
+first &lt;a href=&quot;https://github.com/jopecko/jopecko.github.io/commit/6c03a4c074b91db4cf2b74d00b806a93d8c25206&quot;&gt;commit&lt;/a&gt; to test the action and make sure the pipeline worked as expected. The
+action can be configured with the following snippet:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deploy jekyll site to GH Pages&lt;/span&gt;
+
+&lt;span class=&quot;na&quot;&gt;on&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;push&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;branches&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;master&lt;/span&gt;
+
+&lt;span class=&quot;na&quot;&gt;jobs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;jekyll&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;runs-on&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ubuntu-16.04&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;steps&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;uses&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;actions/checkout@v2&lt;/span&gt;
+
+      &lt;span class=&quot;c1&quot;&gt;# Use GitHub Actions' cache to shorten build times&lt;/span&gt;
+      &lt;span class=&quot;c1&quot;&gt;# and decrease server load&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;uses&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;actions/cache@v2&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vendor/bundle&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;${{ runner.os }}-gems=${{ hashFiles('**/Gemfile') }}&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;restore-keys&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;${{ runner.os }}-gems-&lt;/span&gt;
+
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;uses&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;helaili/jekyll-action@v2&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;token&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;${{ secrets.JEKYLL_PAT }}&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;target_branch&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;gh-pages'&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;where &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;JEKYLL_PAT&lt;/code&gt; represents the secret that was created for my repo. After this commit was
+built, I saw that the action created a new &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; branch in my repository with the statically
+generated site contents. I then changed the source branch in the Setting tab under GitHub Pages
+to reflect the new branch that GitHub should use to publish my site contents. After this was
+complete, I was able to easily add the new &lt;a href=&quot;https://github.com/jopecko/jopecko.github.io/commit/8a0cd8d5f214503dafce352450c6cad80ca938cf&quot;&gt;snippets&lt;/a&gt; section to my blog.&lt;/p&gt;
+
+&lt;p&gt;Here’s to more forthcoming contributions!&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 27 Feb 2021 14:08:00 +0000</pubDate>
+        <link>/blog/jekyll/github/workflow/2021/02/27/jekyll-github-actions.html</link>
+        <guid isPermaLink="true">/blog/jekyll/github/workflow/2021/02/27/jekyll-github-actions.html</guid>
+        
+        
+        <category>blog</category>
+        
+        <category>jekyll</category>
+        
+        <category>github</category>
+        
+        <category>workflow</category>
+        
+      </item>
+    
+      <item>
+        <title>Auto Derived Typeclasses - a cautionary tale</title>
+        <description>&lt;p&gt;On a recent greenfield project, where we were quickly iterating on features and hammering
+out the shape of a new Scala μservice, we decided to use Circe’s
+&lt;a href=&quot;https://circe.github.io/circe/codecs/auto-derivation.html&quot;&gt;automatic typeclass derivation&lt;/a&gt; to synthesize the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Encoder&lt;/code&gt;s and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Decoder&lt;/code&gt;s for the
+GADTs used in our REST layer. At first glance, automatic derivation seemed like a total
+win. The codebase was clean and unencumbered with any of the necessary boilerplate usually
+involving the declaration of serdes. The compiler will materialize any typeclass type &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;T&lt;/code&gt;
+that’s not in scope. All that’s required is a simple import &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;io.circe.generic.auto._&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;At first everything was great as we were free to hack with wild abandon as we fleshed out
+the requirements. In retrospect it feels that relying so heavily on this was willfully
+embracing &lt;a href=&quot;https://en.wikipedia.org/wiki/Creeping_normality&quot;&gt;creeping normality&lt;/a&gt; as compilation times starting ticking slowly, imperceptibly,
+upwards. Looking back, it should have been obvious there was issues looming in the future.
+However, these subtle increases to the project’s compilation time is pratically undetectable
+and too easily ignored. Scala is already quite well-known for lengthy compilation times and
+during a typical day, when you’re busy hacking, compiling, reading slack, etc., its all too
+easy to neglect.&lt;/p&gt;
+
+&lt;p&gt;The first sign of trouble appeared seemingly out of no where. An otherwise standard and
+minimally additive patch started behaving erratically on our CI system. Builds were successful
+&lt;em&gt;most&lt;/em&gt; of the time, but occassionally failed. And when they failed, they failed for baffling
+reasons. Coupled with the fact that we had recently upgraded &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sbt&lt;/code&gt;, we found ourselves chasing
+non-existent tooling issues. For example, this was an example of one the interrmitent errors we
+were seeing:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[info] Compiling 75 Scala sources to /some-service/target/scala-2.13/classes ...
+[error] ## Exception when compiling 75 sources to /some-service/target/scala-2.13/classes
+[error] java.lang.NoClassDefFoundError: xsbt/DelegatingReporter$CompileProblem
+[error] xsbt.DelegatingReporter.info0(DelegatingReporter.scala:181)
+[error] scala.tools.nsc.reporters.MakeFilteringForwardingReporter.doReport(ForwardingReporter.scala:59)
+[error] scala.tools.nsc.reporters.FilteringReporter.info0(Reporter.scala:93)
+[error] scala.reflect.internal.Reporter.echo(Reporting.scala:112)
+[error] scala.reflect.internal.Reporter.echo(Reporting.scala:111)
+[error] scoverage.ScoverageInstrumentationComponent$$anon$1.run(plugin.scala:119)
+[error] scala.tools.nsc.Global$Run.compileUnitsInternal(Global.scala:1505)
+[error] scala.tools.nsc.Global$Run.compileUnits(Global.scala:1489)
+[error] scala.tools.nsc.Global$Run.compileSources(Global.scala:1481)
+[error] scala.tools.nsc.Global$Run.compile(Global.scala:1616)
+[error] xsbt.CachedCompiler0.run(CompilerInterface.scala:153)
+[error] xsbt.CachedCompiler0.run(CompilerInterface.scala:125)
+[error] xsbt.CompilerInterface.run(CompilerInterface.scala:39)
+[error] java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+[error] java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+[error] java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+[error] java.base/java.lang.reflect.Method.invoke(Method.java:566)
+[error] sbt.internal.inc.AnalyzingCompiler.call(AnalyzingCompiler.scala:248)
+[error] sbt.internal.inc.AnalyzingCompiler.compile(AnalyzingCompiler.scala:122)
+[error] sbt.internal.inc.AnalyzingCompiler.compile(AnalyzingCompiler.scala:95)
+[error] sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$4(MixedAnalyzingCompiler.scala:91)
+[error] scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+[error] sbt.internal.inc.MixedAnalyzingCompiler.timed(MixedAnalyzingCompiler.scala:186)
+[error] sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$3(MixedAnalyzingCompiler.scala:82)
+[error] sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$3$adapted(MixedAnalyzingCompiler.scala:77)
+[error] sbt.internal.inc.JarUtils$.withPreviousJar(JarUtils.scala:215)
+[error] sbt.internal.inc.MixedAnalyzingCompiler.compileScala$1(MixedAnalyzingCompiler.scala:77)
+[error] sbt.internal.inc.MixedAnalyzingCompiler.compile(MixedAnalyzingCompiler.scala:146)
+[error] sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileInternal$1(IncrementalCompilerImpl.scala:343)
+[error] sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileInternal$1$adapted(IncrementalCompilerImpl.scala:343)
+[error] sbt.internal.inc.Incremental$.doCompile(Incremental.scala:120)
+[error] sbt.internal.inc.Incremental$.$anonfun$compile$4(Incremental.scala:100)
+[error] sbt.internal.inc.IncrementalCommon.recompileClasses(IncrementalCommon.scala:180)
+[error] sbt.internal.inc.IncrementalCommon.cycle(IncrementalCommon.scala:98)
+[error] sbt.internal.inc.Incremental$.$anonfun$compile$3(Incremental.scala:102)
+[error] sbt.internal.inc.Incremental$.manageClassfiles(Incremental.scala:155)
+[error] sbt.internal.inc.Incremental$.compile(Incremental.scala:92)
+[error] sbt.internal.inc.IncrementalCompile$.apply(Compile.scala:75)
+[error] sbt.internal.inc.IncrementalCompilerImpl.compileInternal(IncrementalCompilerImpl.scala:348)
+[error] sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileIncrementally$1(IncrementalCompilerImpl.scala:301)
+[error] sbt.internal.inc.IncrementalCompilerImpl.handleCompilationError(IncrementalCompilerImpl.scala:168)
+[error] sbt.internal.inc.IncrementalCompilerImpl.compileIncrementally(IncrementalCompilerImpl.scala:248)
+[error] sbt.internal.inc.IncrementalCompilerImpl.compile(IncrementalCompilerImpl.scala:74)
+[error] sbt.Defaults$.compileIncrementalTaskImpl(Defaults.scala:1765)
+[error] sbt.Defaults$.$anonfun$compileIncrementalTask$1(Defaults.scala:1738)
+[error] scala.Function1.$anonfun$compose$1(Function1.scala:49)
+[error] sbt.internal.util.$tilde$greater.$anonfun$$u2219$1(TypeFunctions.scala:62)
+[error] sbt.std.Transform$$anon$4.work(Transform.scala:67)
+[error] sbt.Execute.$anonfun$submit$2(Execute.scala:281)
+[error] sbt.internal.util.ErrorHandling$.wideConvert(ErrorHandling.scala:19)
+[error] sbt.Execute.work(Execute.scala:290)
+[error] sbt.Execute.$anonfun$submit$1(Execute.scala:281)
+[error] sbt.ConcurrentRestrictions$$anon$4.$anonfun$submitValid$1(ConcurrentRestrictions.scala:178)
+[error] sbt.CompletionService$$anon$2.call(CompletionService.scala:37)
+[error] java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+[error] java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+[error] java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+[error] java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+[error] java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+[error] java.base/java.lang.Thread.run(Thread.java:834)
+[error]
+[error] java.lang.NoClassDefFoundError: xsbt/DelegatingReporter$CompileProblem
+[error] 	at xsbt.DelegatingReporter.info0(DelegatingReporter.scala:181)
+[error] 	at scala.tools.nsc.reporters.MakeFilteringForwardingReporter.doReport(ForwardingReporter.scala:59)
+[error] 	at scala.tools.nsc.reporters.FilteringReporter.info0(Reporter.scala:93)
+[error] 	at scala.reflect.internal.Reporter.echo(Reporting.scala:112)
+[error] 	at scala.reflect.internal.Reporter.echo(Reporting.scala:111)
+[error] 	at scoverage.ScoverageInstrumentationComponent$$anon$1.run(plugin.scala:119)
+[error] 	at scala.tools.nsc.Global$Run.compileUnitsInternal(Global.scala:1505)
+[error] 	at scala.tools.nsc.Global$Run.compileUnits(Global.scala:1489)
+[error] 	at scala.tools.nsc.Global$Run.compileSources(Global.scala:1481)
+[error] 	at scala.tools.nsc.Global$Run.compile(Global.scala:1616)
+[error] 	at xsbt.CachedCompiler0.run(CompilerInterface.scala:153)
+[error] 	at xsbt.CachedCompiler0.run(CompilerInterface.scala:125)
+[error] 	at xsbt.CompilerInterface.run(CompilerInterface.scala:39)
+[error] 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+[error] 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+[error] 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+[error] 	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+[error] 	at sbt.internal.inc.AnalyzingCompiler.call(AnalyzingCompiler.scala:248)
+[error] 	at sbt.internal.inc.AnalyzingCompiler.compile(AnalyzingCompiler.scala:122)
+[error] 	at sbt.internal.inc.AnalyzingCompiler.compile(AnalyzingCompiler.scala:95)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$4(MixedAnalyzingCompiler.scala:91)
+[error] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.timed(MixedAnalyzingCompiler.scala:186)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$3(MixedAnalyzingCompiler.scala:82)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$3$adapted(MixedAnalyzingCompiler.scala:77)
+[error] 	at sbt.internal.inc.JarUtils$.withPreviousJar(JarUtils.scala:215)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.compileScala$1(MixedAnalyzingCompiler.scala:77)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.compile(MixedAnalyzingCompiler.scala:146)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileInternal$1(IncrementalCompilerImpl.scala:343)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileInternal$1$adapted(IncrementalCompilerImpl.scala:343)
+[error] 	at sbt.internal.inc.Incremental$.doCompile(Incremental.scala:120)
+[error] 	at sbt.internal.inc.Incremental$.$anonfun$compile$4(Incremental.scala:100)
+[error] 	at sbt.internal.inc.IncrementalCommon.recompileClasses(IncrementalCommon.scala:180)
+[error] 	at sbt.internal.inc.IncrementalCommon.cycle(IncrementalCommon.scala:98)
+[error] 	at sbt.internal.inc.Incremental$.$anonfun$compile$3(Incremental.scala:102)
+[error] 	at sbt.internal.inc.Incremental$.manageClassfiles(Incremental.scala:155)
+[error] 	at sbt.internal.inc.Incremental$.compile(Incremental.scala:92)
+[error] 	at sbt.internal.inc.IncrementalCompile$.apply(Compile.scala:75)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.compileInternal(IncrementalCompilerImpl.scala:348)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileIncrementally$1(IncrementalCompilerImpl.scala:301)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.handleCompilationError(IncrementalCompilerImpl.scala:168)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.compileIncrementally(IncrementalCompilerImpl.scala:248)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.compile(IncrementalCompilerImpl.scala:74)
+[error] 	at sbt.Defaults$.compileIncrementalTaskImpl(Defaults.scala:1765)
+[error] 	at sbt.Defaults$.$anonfun$compileIncrementalTask$1(Defaults.scala:1738)
+[error] 	at scala.Function1.$anonfun$compose$1(Function1.scala:49)
+[error] 	at sbt.internal.util.$tilde$greater.$anonfun$$u2219$1(TypeFunctions.scala:62)
+[error] 	at sbt.std.Transform$$anon$4.work(Transform.scala:67)
+[error] 	at sbt.Execute.$anonfun$submit$2(Execute.scala:281)
+[error] 	at sbt.internal.util.ErrorHandling$.wideConvert(ErrorHandling.scala:19)
+[error] 	at sbt.Execute.work(Execute.scala:290)
+[error] 	at sbt.Execute.$anonfun$submit$1(Execute.scala:281)
+[error] 	at sbt.ConcurrentRestrictions$$anon$4.$anonfun$submitValid$1(ConcurrentRestrictions.scala:178)
+[error] 	at sbt.CompletionService$$anon$2.call(CompletionService.scala:37)
+[error] 	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+[error] 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+[error] 	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+[error] 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+[error] 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+[error] 	at java.base/java.lang.Thread.run(Thread.java:834)
+[error] Caused by: java.lang.ClassNotFoundException: xsbt.DelegatingReporter$CompileProblem
+[error] 	at java.base/java.net.URLClassLoader.findClass(URLClassLoader.java:471)
+[error] 	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:588)
+[error] 	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:521)
+[error] 	at xsbt.DelegatingReporter.info0(DelegatingReporter.scala:181)
+[error] 	at scala.tools.nsc.reporters.MakeFilteringForwardingReporter.doReport(ForwardingReporter.scala:59)
+[error] 	at scala.tools.nsc.reporters.FilteringReporter.info0(Reporter.scala:93)
+[error] 	at scala.reflect.internal.Reporter.echo(Reporting.scala:112)
+[error] 	at scala.reflect.internal.Reporter.echo(Reporting.scala:111)
+[error] 	at scoverage.ScoverageInstrumentationComponent$$anon$1.run(plugin.scala:119)
+[error] 	at scala.tools.nsc.Global$Run.compileUnitsInternal(Global.scala:1505)
+[error] 	at scala.tools.nsc.Global$Run.compileUnits(Global.scala:1489)
+[error] 	at scala.tools.nsc.Global$Run.compileSources(Global.scala:1481)
+[error] 	at scala.tools.nsc.Global$Run.compile(Global.scala:1616)
+[error] 	at xsbt.CachedCompiler0.run(CompilerInterface.scala:153)
+[error] 	at xsbt.CachedCompiler0.run(CompilerInterface.scala:125)
+[error] 	at xsbt.CompilerInterface.run(CompilerInterface.scala:39)
+[error] 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+[error] 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+[error] 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+[error] 	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+[error] 	at sbt.internal.inc.AnalyzingCompiler.call(AnalyzingCompiler.scala:248)
+[error] 	at sbt.internal.inc.AnalyzingCompiler.compile(AnalyzingCompiler.scala:122)
+[error] 	at sbt.internal.inc.AnalyzingCompiler.compile(AnalyzingCompiler.scala:95)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$4(MixedAnalyzingCompiler.scala:91)
+[error] 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.timed(MixedAnalyzingCompiler.scala:186)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$3(MixedAnalyzingCompiler.scala:82)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.$anonfun$compile$3$adapted(MixedAnalyzingCompiler.scala:77)
+[error] 	at sbt.internal.inc.JarUtils$.withPreviousJar(JarUtils.scala:215)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.compileScala$1(MixedAnalyzingCompiler.scala:77)
+[error] 	at sbt.internal.inc.MixedAnalyzingCompiler.compile(MixedAnalyzingCompiler.scala:146)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileInternal$1(IncrementalCompilerImpl.scala:343)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileInternal$1$adapted(IncrementalCompilerImpl.scala:343)
+[error] 	at sbt.internal.inc.Incremental$.doCompile(Incremental.scala:120)
+[error] 	at sbt.internal.inc.Incremental$.$anonfun$compile$4(Incremental.scala:100)
+[error] 	at sbt.internal.inc.IncrementalCommon.recompileClasses(IncrementalCommon.scala:180)
+[error] 	at sbt.internal.inc.IncrementalCommon.cycle(IncrementalCommon.scala:98)
+[error] 	at sbt.internal.inc.Incremental$.$anonfun$compile$3(Incremental.scala:102)
+[error] 	at sbt.internal.inc.Incremental$.manageClassfiles(Incremental.scala:155)
+[error] 	at sbt.internal.inc.Incremental$.compile(Incremental.scala:92)
+[error] 	at sbt.internal.inc.IncrementalCompile$.apply(Compile.scala:75)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.compileInternal(IncrementalCompilerImpl.scala:348)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.$anonfun$compileIncrementally$1(IncrementalCompilerImpl.scala:301)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.handleCompilationError(IncrementalCompilerImpl.scala:168)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.compileIncrementally(IncrementalCompilerImpl.scala:248)
+[error] 	at sbt.internal.inc.IncrementalCompilerImpl.compile(IncrementalCompilerImpl.scala:74)
+[error] 	at sbt.Defaults$.compileIncrementalTaskImpl(Defaults.scala:1765)
+[error] 	at sbt.Defaults$.$anonfun$compileIncrementalTask$1(Defaults.scala:1738)
+[error] 	at scala.Function1.$anonfun$compose$1(Function1.scala:49)
+[error] 	at sbt.internal.util.$tilde$greater.$anonfun$$u2219$1(TypeFunctions.scala:62)
+[error] 	at sbt.std.Transform$$anon$4.work(Transform.scala:67)
+[error] 	at sbt.Execute.$anonfun$submit$2(Execute.scala:281)
+[error] 	at sbt.internal.util.ErrorHandling$.wideConvert(ErrorHandling.scala:19)
+[error] 	at sbt.Execute.work(Execute.scala:290)
+[error] 	at sbt.Execute.$anonfun$submit$1(Execute.scala:281)
+[error] 	at sbt.ConcurrentRestrictions$$anon$4.$anonfun$submitValid$1(ConcurrentRestrictions.scala:178)
+[error] 	at sbt.CompletionService$$anon$2.call(CompletionService.scala:37)
+[error] 	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+[error] 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:515)
+[error] 	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+[error] 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+[error] 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+[error] 	at java.base/java.lang.Thread.run(Thread.java:834)
+[error] (Compile / compileIncremental) java.lang.NoClassDefFoundError: xsbt/DelegatingReporter$CompileProblem
+[error] Total time: 115 s (01:55), completed Aug 21, 2020, 10:37:21 PM
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Upon stumbling on this error, we started to think we had some incompatibilities with the
+compiler plugins we were using and the version of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sbt&lt;/code&gt;. Every plugin backed out and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sbt&lt;/code&gt;
+version change produced the same or similar failures. Some builds succeeded and some failed.
+ We had to start looking elsewhere.&lt;/p&gt;
+
+&lt;p&gt;Since we build within a container, we started to suspect that perhaps we were running out of
+memory in our build process. We had to allocate an obsene amount of memory to our container
+to get the build back to consistently green. This was when I started to suspect a problem
+with our implicit approach.&lt;/p&gt;
+
+&lt;p&gt;Running builds with the following &lt;a href=&quot;https://docs.scala-lang.org/overviews/compiler-options/index.html&quot;&gt;compiler flags&lt;/a&gt;:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;-Ystatistics&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;-Yshow-trees&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;-Ydebug&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;started to shed some light on the situation. The times spent handling implicits seemed to have
+become an issue. Then I discovered &lt;a href=&quot;https://www.scala-lang.org/blog/2018/06/04/scalac-profiling.html&quot;&gt;this&lt;/a&gt; blog post on scalac profiling, which discusses the
+cost of implicit macros. At this point I figured a quick fix would be to just switch to Circe’s
+&lt;a href=&quot;https://circe.github.io/circe/codecs/semiauto-derivation.html&quot;&gt;semi-automatic derivation&lt;/a&gt; instead. Placing them in the companion objects for the GADTs
+minimizes the &lt;a href=&quot;https://vimeo.com/20308847&quot;&gt;implicit import tax&lt;/a&gt; as well.&lt;/p&gt;
+
+&lt;p&gt;In retrospect, I feel like my experience should have warned me off of auto derivation but the
+appeal was too great at the time. I can only hope that, given another chance to make a similar
+decision, I don’t repeat this mistake. I’m sure auto derived typeclasses have their place,
+however, I’m not sure at this time what that could be. Time permitting, I’d like to revisit this
+in the future and do a proper post-mortem on this comparing the two approaches and figuring out
+what was saved by changing from one approach to the other. For another time though…&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 26 Aug 2020 20:26:27 +0000</pubDate>
+        <link>/scala/circe/typeclasses/performance/2020/08/26/auto-derived-typeclasses.html</link>
+        <guid isPermaLink="true">/scala/circe/typeclasses/performance/2020/08/26/auto-derived-typeclasses.html</guid>
+        
+        
+        <category>scala</category>
+        
+        <category>circe</category>
+        
+        <category>typeclasses</category>
+        
+        <category>performance</category>
+        
+      </item>
+    
+      <item>
+        <title>Purely Functional Package Management</title>
+        <description>&lt;p&gt;Being a fan of pure functional programming, I’m intrigued by the prospect of
+applying those concepts to package management on my systems. Since I’m mostly
+on macOS these days, I’m going to start with the &lt;a href=&quot;https://nixos.org/nix/&quot;&gt;Nix&lt;/a&gt; package manager for
+my initial foray into this new and exciting world.&lt;/p&gt;
+
+&lt;p&gt;I’ve been a dedicated user of &lt;a href=&quot;https://brew.sh/&quot;&gt;Homebrew&lt;/a&gt; since &lt;a href=&quot;https://mxcl.dev/&quot;&gt;Max&lt;/a&gt; first released it.
+However, after watching Tim Steinbach’s λC 2019 presentation &lt;a href=&quot;https://www.youtube.com/watch?v=_LDzO5_d1a0&quot;&gt;Sane System
+Management with NixOS - I Do Declare!&lt;/a&gt;, I found myself motivated to give Nix
+a try. The talk is well worth a watch. Tim does a good job of making the case
+for using Nix. For me, some highlights from the talk were&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;One single configuration file for kernel, services, and updates&lt;/li&gt;
+  &lt;li&gt;Atomic upgrades and rollbacks&lt;/li&gt;
+  &lt;li&gt;Side-by-side installation of different versions of the same package&lt;/li&gt;
+  &lt;li&gt;(Re-)installation within minutes&lt;/li&gt;
+  &lt;li&gt;Bitwise reproducibility of the entire system&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;quickstart&quot;&gt;Quickstart&lt;/h3&gt;
+
+&lt;p&gt;The first time I ran through the steps below, I ran into the following issue on
+Catalina:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir: cannot create directory ‘/nix’: Read-only file system
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Starting with Catalina, macOS is split across two volumes (system and data) with
+the system volume being read-only and non-writable. After some searching through
+Nix issues and random blog posts I came across &lt;a href=&quot;https://github.com/NixOS/nix/pull/3212&quot;&gt;NixOS/nix#3212&lt;/a&gt; and the
+relevant &lt;a href=&quot;https://github.com/LnL7/nix/blob/darwin-10.15-install/scripts/create-darwin-volume.sh&quot;&gt;script&lt;/a&gt; to help create the appropriate APFS volume and mount point.
+The shortened URL follows:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ curl -L https://git.io/JfRJm | sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once completed you’ll see the following output:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; ------------------------------------------------------------------
+| This installer will create a volume for the nix store and        |
+| configure it to mount at /nix.  Follow these steps to uninstall. |
+  ------------------------------------------------------------------
+
+  1. Remove the entry from fstab using 'sudo vifs'
+  2. Destroy the data volume using 'diskutil apfs deleteVolume'
+  3. Remove the 'nix' line from /etc/synthetic.conf or the file
+
+Configuring /etc/synthetic.conf...
+Password:
+nix
+Creating mountpoint for /nix...
+Creating a Nix Store volume...
+Will export new APFS Volume &quot;Nix Store&quot; from APFS Container Reference disk1
+Started APFS operation on disk1
+Preparing to add APFS Volume to APFS Container disk1
+Creating APFS Volume
+Created new APFS Volume disk1s6
+Mounting disk
+Setting volume permissions
+Disk from APFS operation: disk1s6
+Finished APFS operation on disk1
+Configuring /etc/fstab...
+123
+164
+
+The following options can be enabled to disable spotlight indexing
+of the volume, which might be desirable.
+
+   $ sudo mdutil -i off /nix
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I wasn’t able to successfully disable spotlight indexing of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/nix&lt;/code&gt; volume
+until after I rebooted my machine, which you need to do before proceeding anyway.
+Now that the volume is available, we can proceed with the installation.&lt;/p&gt;
+
+&lt;p&gt;By default, the Nix installer will perform a single-user installation. However,
+the documentation &lt;em&gt;highly&lt;/em&gt; recommends opting in to the mult-user installation.&lt;/p&gt;
+
+&lt;p&gt;From a terminal, install multi-user Nix:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ sh &amp;lt;(curl https://nixos.org/nix/install) --daemon
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Since Nix installs everything in the Nix store, removal is quite easy if we
+find that we don’t actually like the project. On macOS:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ sudo rm -rf \
+      /etc/profile/nix.sh \
+      /etc/nix \
+      /nix \
+      ~root/.nix-profile \
+      ~root/.nix-defexpr \
+      ~root/.nix-channels \
+      ~/.nix-profile \
+      ~/.nix-defexpr \
+      ~/.nix-channels
+
+$ sudo launchctl unload /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+$ sudo rm /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+
+# rollback global etc files modified during install
+$ mv /etc/profile.backup-before-nix /etc/profile
+$ mv /etc/bashrc.backup-before-nix /etc/bashrc
+$ mv /etc/zshrc.backup-before-nix /etc/zshrc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;migrating-off-of-homebrew&quot;&gt;Migrating off of homebrew&lt;/h3&gt;
+&lt;p&gt;Before we start messing with our installed packages, its a good idea to dump
+our homebrew packages so we can restore everything if things go sideways with,
+or we decide we don’t actually like, Nix.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ brew bundle dump
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This will generate a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Brewfile&lt;/code&gt; in the current working directory, which we can
+squirrel away in the event we need it later. We can restore our homebrew managed
+packages with:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ brew bundle
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Hopefully we won’t need it as I anticipate not wanting to come back after
+we free our mind and take the red pill, but better to be safe and prepared just
+in case we change our mind.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.softinio.com/post/moving-from-homebrew-to-nix-package-manager&quot;&gt;Salar Rahmanian&lt;/a&gt; put together a quick guide on getting started migrating
+off homebrew. In it he provides a command that lists the formula installed by
+homebrew and the formulae installed that specify the formula as a dependency.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ brew list -1 \
+    | while read formula; do echo -ne &quot;\x1B[1;34m $formula \x1B[0m&quot;; brew uses $formula --installed \
+    | awk '{printf(&quot; %s &quot;, $0)}'; echo &quot;&quot;; done
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once you’ve visualized your homebrew footprint you can use the CLI to look for
+a similarly named package:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ nix-env -qaP | grep -i &amp;lt;packagename&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;or &lt;a href=&quot;https://nixos.org/nixos/packages.html&quot;&gt;search packages&lt;/a&gt; online to find a suitable Nix flavored package.&lt;/p&gt;
+
+&lt;p&gt;Another helpful resource that goes deeper into Nix is Geoffrey Huntley’s
+&lt;a href=&quot;https://github.com/ghuntley/workshops/tree/master/nix-workshop&quot;&gt;Mastering Nix Workshop&lt;/a&gt;. This coupled with &lt;a href=&quot;https://github.com/ghuntley/workshops/tree/master/nixos-workshop&quot;&gt;Mastering NixOS&lt;/a&gt; offer a
+treasure trove of learnings I plan on mining next.&lt;/p&gt;
+
+&lt;h3 id=&quot;next-steps&quot;&gt;Next Steps&lt;/h3&gt;
+
+&lt;p&gt;In Tim’s talk, he mentions how he uses &lt;a href=&quot;https://nixos.org/&quot;&gt;NixOS&lt;/a&gt; in addition to the Nix package
+manager. NixOS is a GNU/Linux distribution that allows you to achieve a fully
+declarative system configuration model. &lt;a href=&quot;https://github.com/LnL7/nix-darwin&quot;&gt;Nix modules for darwin&lt;/a&gt; attempts to
+achieve similar things for macOS.&lt;/p&gt;
+
+&lt;p&gt;Once I’ve fully digested these concepts, I’d like to codify the best practices in
+my &lt;a href=&quot;https://github.com/jopecko/dotfiles&quot;&gt;dotfiles&lt;/a&gt; repo and get to an even more idealized place of consistent,
+functional, and sane systems management.&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 09 May 2020 21:08:26 +0000</pubDate>
+        <link>/nix/2020/05/09/purely-functional-package-management.html</link>
+        <guid isPermaLink="true">/nix/2020/05/09/purely-functional-package-management.html</guid>
+        
+        
+        <category>nix</category>
+        
+      </item>
+    
+      <item>
+        <title>Reboot</title>
+        <description>&lt;p&gt;I’m declaring bankruptcy on my blog and starting over again with a shiny new theme and the hope that I’ll be more consistent and deliberate. Stay tuned.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 26 Mar 2019 20:44:26 +0000</pubDate>
+        <link>/misc/2019/03/26/reboot.html</link>
+        <guid isPermaLink="true">/misc/2019/03/26/reboot.html</guid>
+        
+        
+        <category>misc</category>
+        
+      </item>
+    
+  </channel>
+</rss>

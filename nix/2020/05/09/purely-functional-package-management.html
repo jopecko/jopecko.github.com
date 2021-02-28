@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Purely Functional Package Management</title>
+  <meta name="description" content="Being a fan of pure functional programming, I’m intrigued by the prospect ofapplying those concepts to package management on my systems. Since I’m mostlyon m...">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/assets/evil-icons.min.css">
+  <script src="/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="/nix/2020/05/09/purely-functional-package-management.html">
+  <link rel="alternate" type="application/rss+xml" title="nearly functional" href="/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/">nearly functional</a></h2>
+
+  <div class="nav">
+
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/">Home</a></li>
+          <li><a href="/archive">Posts</a></li>
+          <li><a href="/snippets">Snippets</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/feed.xml">RSS</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">Purely Functional Package Management</h1>
+    <p class="artilce_meta"><time datetime="2020-05-09T21:08:26+00:00" itemprop="datePublished">May 9, 2020</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <p>Being a fan of pure functional programming, I’m intrigued by the prospect of
+applying those concepts to package management on my systems. Since I’m mostly
+on macOS these days, I’m going to start with the <a href="https://nixos.org/nix/">Nix</a> package manager for
+my initial foray into this new and exciting world.</p>
+
+<p>I’ve been a dedicated user of <a href="https://brew.sh/">Homebrew</a> since <a href="https://mxcl.dev/">Max</a> first released it.
+However, after watching Tim Steinbach’s λC 2019 presentation <a href="https://www.youtube.com/watch?v=_LDzO5_d1a0">Sane System
+Management with NixOS - I Do Declare!</a>, I found myself motivated to give Nix
+a try. The talk is well worth a watch. Tim does a good job of making the case
+for using Nix. For me, some highlights from the talk were</p>
+
+<ul>
+  <li>One single configuration file for kernel, services, and updates</li>
+  <li>Atomic upgrades and rollbacks</li>
+  <li>Side-by-side installation of different versions of the same package</li>
+  <li>(Re-)installation within minutes</li>
+  <li>Bitwise reproducibility of the entire system</li>
+</ul>
+
+<h3 id="quickstart">Quickstart</h3>
+
+<p>The first time I ran through the steps below, I ran into the following issue on
+Catalina:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir: cannot create directory ‘/nix’: Read-only file system
+</code></pre></div></div>
+
+<p>Starting with Catalina, macOS is split across two volumes (system and data) with
+the system volume being read-only and non-writable. After some searching through
+Nix issues and random blog posts I came across <a href="https://github.com/NixOS/nix/pull/3212">NixOS/nix#3212</a> and the
+relevant <a href="https://github.com/LnL7/nix/blob/darwin-10.15-install/scripts/create-darwin-volume.sh">script</a> to help create the appropriate APFS volume and mount point.
+The shortened URL follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ curl -L https://git.io/JfRJm | sh
+</code></pre></div></div>
+
+<p>Once completed you’ll see the following output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ------------------------------------------------------------------
+| This installer will create a volume for the nix store and        |
+| configure it to mount at /nix.  Follow these steps to uninstall. |
+  ------------------------------------------------------------------
+
+  1. Remove the entry from fstab using 'sudo vifs'
+  2. Destroy the data volume using 'diskutil apfs deleteVolume'
+  3. Remove the 'nix' line from /etc/synthetic.conf or the file
+
+Configuring /etc/synthetic.conf...
+Password:
+nix
+Creating mountpoint for /nix...
+Creating a Nix Store volume...
+Will export new APFS Volume "Nix Store" from APFS Container Reference disk1
+Started APFS operation on disk1
+Preparing to add APFS Volume to APFS Container disk1
+Creating APFS Volume
+Created new APFS Volume disk1s6
+Mounting disk
+Setting volume permissions
+Disk from APFS operation: disk1s6
+Finished APFS operation on disk1
+Configuring /etc/fstab...
+123
+164
+
+The following options can be enabled to disable spotlight indexing
+of the volume, which might be desirable.
+
+   $ sudo mdutil -i off /nix
+</code></pre></div></div>
+
+<p>I wasn’t able to successfully disable spotlight indexing of the <code class="language-plaintext highlighter-rouge">/nix</code> volume
+until after I rebooted my machine, which you need to do before proceeding anyway.
+Now that the volume is available, we can proceed with the installation.</p>
+
+<p>By default, the Nix installer will perform a single-user installation. However,
+the documentation <em>highly</em> recommends opting in to the mult-user installation.</p>
+
+<p>From a terminal, install multi-user Nix:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sh &lt;(curl https://nixos.org/nix/install) --daemon
+</code></pre></div></div>
+
+<p>Since Nix installs everything in the Nix store, removal is quite easy if we
+find that we don’t actually like the project. On macOS:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo rm -rf \
+      /etc/profile/nix.sh \
+      /etc/nix \
+      /nix \
+      ~root/.nix-profile \
+      ~root/.nix-defexpr \
+      ~root/.nix-channels \
+      ~/.nix-profile \
+      ~/.nix-defexpr \
+      ~/.nix-channels
+
+$ sudo launchctl unload /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+$ sudo rm /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+
+# rollback global etc files modified during install
+$ mv /etc/profile.backup-before-nix /etc/profile
+$ mv /etc/bashrc.backup-before-nix /etc/bashrc
+$ mv /etc/zshrc.backup-before-nix /etc/zshrc
+</code></pre></div></div>
+
+<h3 id="migrating-off-of-homebrew">Migrating off of homebrew</h3>
+<p>Before we start messing with our installed packages, its a good idea to dump
+our homebrew packages so we can restore everything if things go sideways with,
+or we decide we don’t actually like, Nix.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ brew bundle dump
+</code></pre></div></div>
+
+<p>This will generate a <code class="language-plaintext highlighter-rouge">Brewfile</code> in the current working directory, which we can
+squirrel away in the event we need it later. We can restore our homebrew managed
+packages with:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ brew bundle
+</code></pre></div></div>
+
+<p>Hopefully we won’t need it as I anticipate not wanting to come back after
+we free our mind and take the red pill, but better to be safe and prepared just
+in case we change our mind.</p>
+
+<p><a href="https://www.softinio.com/post/moving-from-homebrew-to-nix-package-manager">Salar Rahmanian</a> put together a quick guide on getting started migrating
+off homebrew. In it he provides a command that lists the formula installed by
+homebrew and the formulae installed that specify the formula as a dependency.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ brew list -1 \
+    | while read formula; do echo -ne "\x1B[1;34m $formula \x1B[0m"; brew uses $formula --installed \
+    | awk '{printf(" %s ", $0)}'; echo ""; done
+</code></pre></div></div>
+
+<p>Once you’ve visualized your homebrew footprint you can use the CLI to look for
+a similarly named package:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ nix-env -qaP | grep -i &lt;packagename&gt;
+</code></pre></div></div>
+
+<p>or <a href="https://nixos.org/nixos/packages.html">search packages</a> online to find a suitable Nix flavored package.</p>
+
+<p>Another helpful resource that goes deeper into Nix is Geoffrey Huntley’s
+<a href="https://github.com/ghuntley/workshops/tree/master/nix-workshop">Mastering Nix Workshop</a>. This coupled with <a href="https://github.com/ghuntley/workshops/tree/master/nixos-workshop">Mastering NixOS</a> offer a
+treasure trove of learnings I plan on mining next.</p>
+
+<h3 id="next-steps">Next Steps</h3>
+
+<p>In Tim’s talk, he mentions how he uses <a href="https://nixos.org/">NixOS</a> in addition to the Nix package
+manager. NixOS is a GNU/Linux distribution that allows you to achieve a fully
+declarative system configuration model. <a href="https://github.com/LnL7/nix-darwin">Nix modules for darwin</a> attempts to
+achieve similar things for macOS.</p>
+
+<p>Once I’ve fully digested these concepts, I’d like to codify the best practices in
+my <a href="https://github.com/jopecko/dotfiles">dotfiles</a> repo and get to an even more idealized place of consistent,
+functional, and sane systems management.</p>
+
+
+  </div>
+
+  <footer class="article-footer">
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/assets/img/profile.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | Joe O'Pecko</p>
+    <p class="bio">
+      Software engineer
+    </p>
+  </div>
+</section>
+
+
+  </footer>
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        <a href="https://github.com/jopecko"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span></a>
+
+        
+        
+        <a href="https://twitter.com/opeckojo"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span></a>
+
+        
+      </section>
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </body>
+</html>
